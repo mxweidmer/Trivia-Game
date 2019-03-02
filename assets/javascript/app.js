@@ -7,6 +7,10 @@ $(document).ready(function () {
     var incorrect = 0;
     var questionCount = 0;
     var questionIndex = 0;
+    var timeLeft = 15;
+
+    var questionInterval;
+    var counterInterval;
 
     var questions =
         [
@@ -70,7 +74,7 @@ $(document).ready(function () {
 
     function createQuestionInterface() {
 
-        $("#communication").text(questions[questionIndex].question);
+        $("#question").text(questions[questionIndex].question);
 
         for (var i = 0; i < questions[questionIndex].answers.length; i++) {
             if (questions[questionIndex].answers[i][0] === false) {
@@ -85,18 +89,37 @@ $(document).ready(function () {
                 $(posArray[i]).append(button);
             }
         }
-        questionCount++;
-        questionIndex++;
+
+        if (questionIndex < questions.length) {
+            questionIndex++;
+            if (questionIndex === questions.length) {
+                clearInterval(interval);
+            }
+        }
+        timeLeft = 15;
     }
 
-    $("#communication").on("click", function () {
-        createQuestionInterface();
+    function counter() {
+        timeLeft--;
+        $("#timer").text("Time remaining: " + timeLeft);
+        if (timeLeft === 0) {
+            incorrect++;
+        }
+    }
 
 
+    $("#start").on("click", function () {
+        $("#start").empty()
+        clearInterval(questionInterval);
+        clearInterval(counterInterval);
+        questionInterval = setInterval(createQuestionInterface, 1000 * 15);
+        counterInterval = setInterval(counter, 1000);
     });
 
+
+
     $(document).on("click", ".btn", function () {
-        createQuestionInterface();
+
 
     });
 
