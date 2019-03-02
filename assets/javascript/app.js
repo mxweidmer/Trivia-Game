@@ -5,9 +5,9 @@ $(document).ready(function () {
 
     var correct = 0;
     var incorrect = 0;
-    var questionCount = 0;
+    var questionCount = 1;
     var questionIndex = 0;
-    var timeLeft = 15;
+    var timeLeft = 16;
 
     var questionInterval;
     var counterInterval;
@@ -90,37 +90,88 @@ $(document).ready(function () {
             }
         }
 
-        if (questionIndex < questions.length) {
-            questionIndex++;
-            if (questionIndex === questions.length) {
-                clearInterval(interval);
-            }
+        questionIndex++;
+
+        if (questionCount === 6) {
+            clearInterval(questionInterval);
+            clearInterval(counterInterval);
+            $("#correct").text("Correct answers: " + correct);
+            $("#question").text("Incorrect answers: " + incorrect);
+            $("#start").text("Click on me to play again!");
+            setTimeout(resetGame, 3000);
         }
-        timeLeft = 15;
     }
 
     function counter() {
         timeLeft--;
         $("#timer").text("Time remaining: " + timeLeft);
         if (timeLeft === 0) {
+            incorrectFunction();
             incorrect++;
         }
     }
 
+    function correctFunction() {
+        $("#start").text("Correct!");
+        clearInterval(counterInterval);
+        clearInterval(questionInterval);
 
-    $("#start").on("click", function () {
+        timeLeft = 16;
+        correct++;
+        questionCount++;
+        setTimeout(start, 3000);
+    }
+
+    function incorrectFunction() {
+        $("#start").text("Incorrect!");
+        clearInterval(counterInterval);
+        clearInterval(questionInterval);
+
+        timeLeft = 16;
+        incorrect++;
+        questionCount++;
+        setTimeout(start, 3000);
+    }
+
+    function start() {
+
         $("#start").empty()
         clearInterval(questionInterval);
         clearInterval(counterInterval);
+
+        createQuestionInterface();
+        counter();
         questionInterval = setInterval(createQuestionInterface, 1000 * 15);
         counterInterval = setInterval(counter, 1000);
+    }
+
+    function resetGame() {
+        $("#correct").text("");
+
+        clearInterval(questionInterval);
+        clearInterval(counterInterval);
+        correct = 0;
+        incorrect = 0;
+        questionCount = 0;
+        questionIndex = 0;
+        timeLeft = 16;
+    }
+
+
+    $("#start").on("click", function () {
+        start();
     });
 
 
 
     $(document).on("click", ".btn", function () {
+        console.log(questionCount);
 
-
+        if ($(this).val() === "right") {
+            correctFunction();
+        } else if ($(this).val() === "wrong") {
+            incorrectFunction();
+        }
     });
 
 
